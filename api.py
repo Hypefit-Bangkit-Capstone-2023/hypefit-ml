@@ -24,17 +24,47 @@ def read_root():
 def recommendation(req: RecommendationRequest):
   matches = []
 
+  dominant_colors = {
+    "tops": {},
+    "bottoms": {},
+    "shoes": {}
+  }
+
+  color_descriptions = {
+    "tops": {},
+    "bottoms": {},
+    "shoes": {}
+  }
+
   for top_key in req.top_keys:
     top_color, _ = get_dominant_colors(get_image_url(top_key))[0]
+    dominant_colors["tops"][top_key] = top_color.tolist()
     top_color_desc = fc.get_color_description(*rgb_to_hsv(top_color))
+    color_descriptions["tops"][top_key] = top_color_desc
+
+  for bottom_key in req.bottom_keys:
+    bottom_color, _ = get_dominant_colors(get_image_url(bottom_key))[0]
+    dominant_colors["bottoms"][bottom_key] = bottom_color.tolist()
+    bottom_color_desc = fc.get_color_description(*rgb_to_hsv(bottom_color))
+    color_descriptions["bottoms"][bottom_key] = bottom_color_desc
+
+  for shoe_key in req.shoe_keys:
+    shoe_color, _ = get_dominant_colors(get_image_url(shoe_key))[0]
+    dominant_colors["shoes"][shoe_key] = shoe_color.tolist()
+    shoe_color_desc = fc.get_color_description(*rgb_to_hsv(shoe_color))
+    color_descriptions["shoes"][shoe_key] = shoe_color_desc
+
+  for top_key in req.top_keys:
+    top_color = dominant_colors["tops"][top_key]
+    top_color_desc = color_descriptions["tops"][top_key]
 
     for bottom_key in req.bottom_keys:
-      bottom_color, _ = get_dominant_colors(get_image_url(bottom_key))[0]
-      bottom_color_desc = fc.get_color_description(*rgb_to_hsv(bottom_color))
+      bottom_color = dominant_colors["bottoms"][bottom_key]
+      bottom_color_desc = color_descriptions["bottoms"][bottom_key]
 
       for shoe_key in req.shoe_keys:
-        shoe_color, _ = get_dominant_colors(get_image_url(shoe_key))[0]
-        shoe_color_desc = fc.get_color_description(*rgb_to_hsv(shoe_color))
+        shoe_color = dominant_colors["shoes"][shoe_key]
+        shoe_color_desc = color_descriptions["shoes"][shoe_key]
 
         cm = ColorMatching([
           top_color_desc,
@@ -46,7 +76,7 @@ def recommendation(req: RecommendationRequest):
 
         matches.append({
           "image_keys": [top_key, bottom_key, shoe_key],
-          "dominant_colors": [top_color.tolist(), bottom_color.tolist(), shoe_color.tolist()],
+          "dominant_colors": [top_color, bottom_color, shoe_color],
           "color_descriptions": [top_color_desc, bottom_color_desc, shoe_color_desc],
           "valid_matches": valid_matches,
         })
