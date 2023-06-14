@@ -1,0 +1,22 @@
+steps:
+  # Build the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/hypefit-389110/hypefit-ml", "."]
+  # Push the container image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/hypefit-389110/hypefit-ml"]
+  # Deploy container image to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      [
+        "run",
+        "deploy",
+        "hypefit-ml",
+        "--image",
+        "gcr.io/hypefit-389110/hypefit-ml",
+        "--region",
+        "asia-southeast2",
+      ]
+images:
+  - gcr.io/hypefit-389110/hypefit-ml

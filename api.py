@@ -4,6 +4,11 @@ from api_utils import get_image_url
 from dominant_colors import get_dominant_colors, rgb_to_hsv
 from fuzzy_color import FuzzyColor
 from color_matching import ColorMatching
+import os
+import uvicorn
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 app = FastAPI()
@@ -47,3 +52,9 @@ def recommendation(req: RecommendationRequest):
         })
 
   return matches
+
+
+port = int(os.environ.get("PORT", 8000))
+host = os.environ.get("HOST", '0.0.0.0')
+if __name__ == "__main__":
+  uvicorn.run(app, host=host, port=port)

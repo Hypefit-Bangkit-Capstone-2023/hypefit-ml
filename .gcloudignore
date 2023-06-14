@@ -1,0 +1,7 @@
+example_images
+.env
+cloudbuild.yaml
+
+venv
+**/____pycache__
+**/*.ipynb
