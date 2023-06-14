@@ -2,14 +2,23 @@ import cv2
 import os
 import numpy as np
 from sklearn.cluster import KMeans
+import requests
+import colorsys
 
 
 def load_image(image_path):
-  _, ext = os.path.splitext(image_path)
-  if ext != '.jpg':
-    raise Exception("Only jpg files are supported")
+  image = None
 
-  image = cv2.imread(image_path)
+  if image_path.startswith('http'):
+    response = requests.get(image_path)
+    np_image = np.frombuffer(response.content, np.uint8)
+    image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
+  else:
+    _, ext = os.path.splitext(image_path)
+    if ext != '.jpg':
+      raise Exception("Only jpg files are supported")
+    image = cv2.imread(image_path)
+
   return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
@@ -42,3 +51,9 @@ def get_dominant_colors(img_path):
   colors_with_percentage_sorted = colors_with_percentage[sorted_indices]
 
   return colors_with_percentage_sorted
+
+
+def rgb_to_hsv(rgb):
+  rgb = rgb / 255
+  h, s, v = colorsys.rgb_to_hsv(*rgb)
+  return h * 360, s * 100, v * 100
