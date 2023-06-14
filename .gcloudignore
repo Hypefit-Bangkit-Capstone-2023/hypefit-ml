@@ -3,5 +3,5 @@ example_images
 cloudbuild.yaml
 
 venv
-**/____pycache__
+**/__pycache__
 **/*.ipynb
